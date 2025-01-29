@@ -31,9 +31,8 @@ jobs:
 
       - name: Tag Docker Image for ECR
         run: |
-          docker tag testecr:latest 975050335973.dkr.ecr.us-east-1.amazonaws.com/testecr:latest  # Tag it for your ECR repository
+          docker tag testecr:latest 924144197303.dkr.ecr.us-east-1.amazonaws.com/testecr:latest  # Tag it for your ECR repository
 
       - name: Push Docker Image to Amazon ECR
         run: |
-          docker push 975050335973.dkr.ecr.us-east-1.amazonaws.com/testecr:latest  # Push the correctly tagged image to ECR
-##
+          docker push 924144197303.dkr.ecr.us-east-1.amazonaws.com/testecr:latest  # Push the correctly tagged image to ECR
