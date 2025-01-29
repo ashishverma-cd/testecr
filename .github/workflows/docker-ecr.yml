@@ -8,7 +8,11 @@ on:
 jobs:
   push_image:
     runs-on: ubuntu-latest  # Run the job on an Ubuntu environment
-    permissions: write-all
+    permissions: 
+      contents: read  # Allow the action to read repository contents (checkout)
+      id-token: write  # Allow OIDC-based authentication
+      actions: write  # For GitHub actions permissions
+      ecr: write  # Grant permissions to push to ECR
 
     steps:
       - name: Checkout code
