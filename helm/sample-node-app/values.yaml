@@ -1,0 +1,40 @@
+replicaCount: 1
+
+image:
+  repository: 940482429350.dkr.ecr.us-west-2.amazonaws.com/sample-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: ecr-secret  # Added this to authenticate with ECR
+
+service:
+  type: ClusterIP
+  port: 3000
+
+containerPort: 3000
+
+resources: 
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: samplenodeapp.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []  # Example TLS configuration can be added later if needed
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
