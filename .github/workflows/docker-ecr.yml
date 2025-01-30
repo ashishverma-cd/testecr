@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - main
+      - develop
 
 env:
   ECR_REPO: 940482429350.dkr.ecr.us-west-2.amazonaws.com/sample-app
   AWS_REGION: us-west-2
+  IMAGE_VERSION: ${{ github.ref_name }}  # Branch name used as a version (e.g., main or develop)
 
 jobs:
   build-and-push:
@@ -33,6 +35,19 @@ jobs:
         with:
           region: ${{ env.AWS_REGION }}
       
+      # Retrieve the Git commit SHA and tag
+      - name: Get Git Commit SHA and Tag
+        id: git_commit
+        run: |
+          # Fetch tags and retrieve the commit SHA
+          git fetch --tags  # Ensure we have the latest tags
+          COMMIT_SHA=$(git rev-parse HEAD)  # Get the current commit ID (SHA)
+          TAG_NAME=$(git describe --tags --abbrev=0)  # Get the latest Git tag (if any)
+          
+          # Set the commit SHA and tag as environment variables
+          echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_ENV
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+
       # Build and push Docker image to ECR
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
@@ -40,7 +55,10 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ env.ECR_REPO }}:latest
+          tags: |
+            ${{ env.ECR_REPO }}:${{ env.COMMIT_SHA }}  # Tag with commit SHA
+            ${{ env.ECR_REPO }}:${{ env.IMAGE_VERSION }}  # Tag with branch name (e.g., main, develop)
+            ${{ env.ECR_REPO }}:${{ env.TAG_NAME }}  # Tag with the latest Git commit tag (if any)
 
   validate-helm:
     runs-on: ubuntu-latest
