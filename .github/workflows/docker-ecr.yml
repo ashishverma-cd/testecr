@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
- 
 
 env:
   ECR_REPO: 940482429350.dkr.ecr.us-west-2.amazonaws.com/sample-app
@@ -34,18 +33,14 @@ jobs:
         with:
           region: ${{ env.AWS_REGION }}
       
-      - name: Build Docker Image
-        run: |
-          docker build -t sample-app:latest ./  # Build the image with the correct tag 
-      - name: Tag Docker Image for ECR
-        run: |
-          docker tag sample-app:latest 940482429350.dkr.ecr.us-west-2.amazonaws.com/sample-app # Tag it for your ECR repository
-      
-       - name: Push Docker Image to Amazon ECR
-        run: |
-          docker push 940482429350.dkr.ecr.us-west-2.amazonaws.com/sample-app  # Push the correctly tagged image to ECR     
-      
-
+      # Build and push Docker image to ECR
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ env.ECR_REPO }}:latest
 
   validate-helm:
     runs-on: ubuntu-latest
