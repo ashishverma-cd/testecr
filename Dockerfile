@@ -1,17 +1,14 @@
-# Use the official Nginx image from Docker Hub
-FROM nginx:mainline-alpine
+# Dockerfile
+FROM node:14
 
-# Set the maintainer label (optional)
-LABEL maintainer="your-email@example.com"
+WORKDIR /usr/src/app
 
-# Copy custom Nginx configuration file (if you have one)
-# COPY nginx.conf /etc/nginx/nginx.conf
-############
-# Copy your static website content (optional)
-# COPY ./html /usr/share/nginx/html
+COPY package*.json ./
 
-# Expose port 80 to access the web server
-EXPOSE 80
+RUN npm install
 
-# The default command to run Nginx
-CMD ["nginx", "-g", "daemon off;"]
+COPY . .
+
+EXPOSE 3000
+
+CMD ["node", "app.js"]
