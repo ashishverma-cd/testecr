@@ -34,7 +34,7 @@ jobs:
       env:
         ECR_REGISTRY: 924144197303.dkr.ecr.us-east-1.amazonaws.com
         ECR_REPOSITORY: test
-        IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+        IMAGE_TAG: ${{ github.sha }}  # Set IMAGE_TAG to latest commit ID
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
