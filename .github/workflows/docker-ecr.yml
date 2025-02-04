@@ -59,7 +59,25 @@ jobs:
       - name: Helm Template
         run: helm template sample-node-app ./helm/sample-node-app > rendered.yaml
 
-      # - name: Deploy Application with Helm
 
+      # Step to update kubeconfig for demo-cluster2
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name demo-cluster2 --kubeconfig eksconfig.yaml
 
+      # Step to deploy to EKS using Helm
+      - name: Deploy Application with Helm
+        uses: koslibpro/helm-eks-action@master
+        with:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
 
+      # Helm upgrade/install command
+      - name: Deploy to EKS
+        run: |
+          export KUBECONFIG=eksconfig.yaml
+          helm upgrade \
+            --install ${{ env.ENVIRONMENT }}-sample-node-app \
+            ./helm/sample-node-app \
+            --set image.repository=${{ env.IMAGE }} \
+            --set image.tag=${{ env.VERSION }} \
+            -n ${{ env.ENVIRONMENT }}
