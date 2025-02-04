@@ -61,7 +61,7 @@ jobs:
 
       - name: Deploy Application with Helm
         run: |
-        helm upgrade --install sample-node-app ./helm/sample-node-app \
+          helm upgrade --install sample-node-app ./helm/sample-node-app \
           --set image.tag=${{ github.sha }} \  # Pass dynamic values
           --set someValue=${{ secrets.SOME_SECRET }} \  # Example of passing a secret
           --set anotherValue=dynamic-value  # Hardcoded or dynamic value
