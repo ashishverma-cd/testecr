@@ -5,11 +5,6 @@ on:
     branches:
       - main
 
-env:
-  ECR_REPO: 924144197303.dkr.ecr.us-east-1.amazonaws.com/test
-  AWS_REGION: us-east-1
-  ROLE_ARN: arn:aws:iam::924144197303:role/docker-ec2-ecr-role  # ARN of the role to assume
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -21,11 +16,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Configure AWS Credentials (Assume Role)
-        uses: aws-actions/configure-aws-credentials@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ env.ROLE_ARN }}  # Assuming the IAM role here
-          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
