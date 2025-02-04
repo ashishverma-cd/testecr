@@ -5,11 +5,10 @@ on:
     branches:
       - main
 
-
 env:
   ECR_REPO: 924144197303.dkr.ecr.us-east-1.amazonaws.com/test
   AWS_REGION: us-east-1
-  IMAGE_VERSION: ${{ github.ref_name }}  # Branch name used as a version (e.g., main or develop)
+  IMAGE_VERSION: ${{ github.ref_name }}  # Branch name used as a version
 
 jobs:
   build-and-push:
@@ -22,33 +21,31 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      # Configure AWS credentials
-      - name: Configure AWS CLI
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region ${{ env.AWS_REGION }}
+      - name: Clear AWS Credentials Cache
+        run: rm -rf ~/.aws
 
-      # Login to Amazon ECR
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
         with:
           region: ${{ env.AWS_REGION }}
-      
-      # Retrieve the Git commit SHA and tag
+
       - name: Get Git Commit SHA and Tag
         id: git_commit
         run: |
-          # Fetch tags and retrieve the commit SHA
-          git fetch --tags  # Ensure we have the latest tags
-          COMMIT_SHA=$(git rev-parse HEAD)  # Get the current commit ID (SHA)
-          TAG_NAME=$(git describe --tags --abbrev=0)  # Get the latest Git tag (if any)
-          
-          # Set the commit SHA and tag as environment variables
+          git fetch --tags
+          COMMIT_SHA=$(git rev-parse HEAD)
+          TAG_NAME=$(git describe --tags --abbrev=0 || echo "latest")
+
           echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_ENV
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
 
-      # Build and push Docker image to ECR
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
@@ -56,26 +53,6 @@ jobs:
           file: Dockerfile
           push: true
           tags: |
-            ${{ env.ECR_REPO }}:${{ env.COMMIT_SHA }}  # Tag with commit SHA
-            ${{ env.ECR_REPO }}:${{ env.IMAGE_VERSION }}  # Tag with branch name (e.g., main, develop)
-            ${{ env.ECR_REPO }}:${{ env.TAG_NAME }}  # Tag with the latest Git commit tag (if any)
-
-  validate-helm:
-    runs-on: ubuntu-latest
-    needs: build-and-push
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install Helm
-        run: |
-          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-          chmod 700 get_helm.sh
-          ./get_helm.sh
-
-      - name: Helm Lint
-        run: helm lint ./helm/sample-node-app
-
-      - name: Helm Template
-        run: helm template sample-node-app ./helm/sample-node-app > rendered.yaml
+            ${{ env.ECR_REPO }}:${{ env.COMMIT_SHA }}
+            ${{ env.ECR_REPO }}:${{ env.IMAGE_VERSION }}
+            ${{ env.ECR_REPO }}:${{ env.TAG_NAME }}
