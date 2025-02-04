@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
-      - develop
+
 
 env:
-  ECR_REPO: 940482429350.dkr.ecr.us-west-2.amazonaws.com/sample-app
-  AWS_REGION: us-west-2
+  ECR_REPO: 924144197303.dkr.ecr.us-east-1.amazonaws.com/test
+  AWS_REGION: us-east-1
   IMAGE_VERSION: ${{ github.ref_name }}  # Branch name used as a version (e.g., main or develop)
 
 jobs:
