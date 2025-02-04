@@ -59,7 +59,7 @@ jobs:
       - name: Helm Template
         run: helm template sample-node-app ./helm/sample-node-app > rendered.yaml
 
-      - name: Deploy Application with Helm
+      # - name: Deploy Application with Helm
 
 
 
