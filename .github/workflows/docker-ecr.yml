@@ -8,6 +8,7 @@ permissions:
   contents: read
   id-token: write
 
+
 jobs:
   build-and-push:
     name: Build and Push to ECR
@@ -67,9 +68,11 @@ jobs:
           role-session-name: helm-deploy
           aws-region: us-east-1
 
-      - name: Authenticate with Kubernetes Cluster
+      - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --name eks-cluster-test --region us-east-1
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --kubeconfig eksconfig.yaml      
+      
+           
 
       - name: Deploy Helm Chart
         run: |
