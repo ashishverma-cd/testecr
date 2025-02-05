@@ -5,6 +5,7 @@ on:
     branches: [ main ]
 
 permissions:
+  contents: read
   id-token: write
 
 jobs:
@@ -12,8 +13,10 @@ jobs:
     name: Build and Push to ECR
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.TOKEN }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
