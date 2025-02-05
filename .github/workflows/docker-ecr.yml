@@ -71,11 +71,12 @@ jobs:
         run: |
           aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --kubeconfig eksconfig.yaml
 
-      - name: Deploy to EKS
-        uses: koslibpro/helm-eks-action@master
-        with:
-          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --kubeconfig eksconfig.yaml
+      - name: Set KUBECONFIG environment variable
+        run: |
           export KUBECONFIG=eksconfig.yaml
+
+      - name: Deploy to EKS
+        run: |
           helm upgrade --install my-app ./helm/sample-node-app \
             --namespace my-app \
             --set image.repository=924144197303.dkr.ecr.us-east-1.amazonaws.com/testecr \
