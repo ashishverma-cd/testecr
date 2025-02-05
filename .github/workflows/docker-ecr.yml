@@ -18,8 +18,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::924144197303:role/akontest
-          role-session-name: akontest
+          role-to-assume: ${{ secrets.ROLE }}
+          role-session-name: token.actions.githubusercontent.com
           aws-region: eu-north-1
 
       - name: Login to Amazon ECR
