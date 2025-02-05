@@ -12,14 +12,11 @@ jobs:
     name: Build and Push to ECR
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.ROLE }}
-          role-session-name: token.actions.githubusercontent.com
+          role-session-name: akontest
           aws-region: eu-north-1
 
       - name: Login to Amazon ECR
