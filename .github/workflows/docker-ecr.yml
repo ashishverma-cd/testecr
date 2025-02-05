@@ -8,7 +8,6 @@ permissions:
   contents: read
   id-token: write
 
-
 jobs:
   build-and-push:
     name: Build and Push to ECR
@@ -70,13 +69,11 @@ jobs:
 
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --kubeconfig eksconfig.yaml      
-          
-          
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --kubeconfig eksconfig.yaml
 
-    - name: Deploy to EKS
-      uses: koslibpro/helm-eks-action@master
-      with:
+      - name: Deploy to EKS
+        uses: koslibpro/helm-eks-action@master
+        with:
           aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --kubeconfig eksconfig.yaml
           export KUBECONFIG=eksconfig.yaml
           helm upgrade --install my-app ./helm/sample-node-app \
@@ -84,4 +81,3 @@ jobs:
             --set image.repository=924144197303.dkr.ecr.us-east-1.amazonaws.com/testecr \
             --set image.tag=${{ github.sha }} \
             --set image.pullSecrets[0].name=ecr-secret
-###
