@@ -83,6 +83,15 @@ jobs:
             --docker-username=AWS \
             --docker-password=$(aws ecr get-login-password --region us-east-1) || echo "Secret already exists"
 
+      - name: Set KUBECONFIG from GitHub Secret
+      run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+        export KUBECONFIG=$HOME/.kube/config
+        kubectl config view # Check if kubeconfig is set correctly
+        
+                 
+
       - name: Deploy Helm Chart
         run: |
           helm upgrade --install my-app ./helm/sample-node-app \
