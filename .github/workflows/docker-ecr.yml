@@ -71,10 +71,6 @@ jobs:
         run: |
           aws eks update-kubeconfig --name eks-cluster-test --region us-east-1
 
-      - name: Create Kubernetes Namespace (if not exists)
-        run: |
-          kubectl create namespace my-app || echo "Namespace already exists"
-
       - name: Deploy Helm Chart
         run: |
           helm upgrade --install my-app ./helm/sample-node-app \
