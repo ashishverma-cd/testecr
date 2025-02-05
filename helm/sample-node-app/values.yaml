@@ -5,3 +5,17 @@ image:
 
 imagePullSecrets:
   - name: ecr-secret
+
+service:
+  type: ClusterIP  # or LoadBalancer, depending on your needs
+  port: 80         # Change to your desired service port
+  containerPort: 3000  # Change to your application's container port
+
+ingress:
+  enabled: true  # Set to false if you don't want to use ingress
+  hosts:
+    - host: your-domain.com  # Change to your domain
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []  # Add TLS configuration if needed
