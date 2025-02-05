@@ -23,14 +23,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and push Docker image
+        - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
           file: Dockerfile
           push: true
-          tags: 924144197303.dkr.ecr.us-east-1.amazonaws.com/testecr
-
+          tags: 924144197303.dkr.ecr.us-east-1.amazonaws.com/test:latest
+  
       - name: Build, Tag, and Push the Image to Amazon ECR
         id: build-image
         env:
