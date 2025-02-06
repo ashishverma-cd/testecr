@@ -1,30 +1,21 @@
-# Step 1: Use a base image that includes Node.js
-FROM node:16 as build
+# Use Node.js base image for building and serving the app
+FROM node:16 
 
-# Set working directory in the container
-WORKDIR /app
+# Set working directory
+WORKDIR /usr/src/app
 
 # Copy package.json and install dependencies
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 
-# Copy the rest of the app's code
+# Copy the application files
 COPY . .
 
-# Step 2: Build the app (if applicable)
+# Build the application
 RUN npm run build
 
-# Step 3: Use a new image with Nginx
-FROM nginx:alpine
+# Expose application port
+EXPOSE 3000
 
-# Copy Nginx configuration file
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Copy the Node.js app (built) into the Nginx folder
-COPY --from=build /app /usr/share/nginx/html
-
-# Expose port for the app
-EXPOSE 80
-
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Run the application
+CMD ["node", "app.js"]
