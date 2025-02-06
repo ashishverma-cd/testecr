@@ -68,10 +68,10 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
       - run: |
           aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --kubeconfig eksconfig.yaml 
-          export KUBECONFIG=eksconfig.yaml
+          export KUBECONFIG=/home/runner/work/testecr/testecr/eksconfig.yaml
           helm upgrade --install my-app ./helm/sample-node-app \
             --namespace my-app \
             --set image.repository=924144197303.dkr.ecr.us-east-1.amazonaws.com/testecr \
             --set image.tag=${{ github.sha }} \
             --set image.pullSecrets[0].name=ecr-secret
-          rm eksconfig.yaml
+          rm /home/runner/work/testecr/testecr/eksconfig.yaml
