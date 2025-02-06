@@ -65,7 +65,7 @@ jobs:
         uses: koslibpro/helm-eks-action@master
         with:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-        run: |
+      - run: |
           aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --kubeconfig eksconfig.yaml
           export KUBECONFIG=eksconfig.yaml
           helm upgrade --install my-app ./helm/sample-node-app \
