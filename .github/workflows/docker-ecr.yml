@@ -40,7 +40,7 @@ jobs:
       - name: Build, Tag, and Push the Image to Amazon ECR
         id: build-image
         env:
-          ECR_REGISTRY: ${{ ECR_REPOSITORY }}
+          ECR_REGISTRY: 924144197303.dkr.ecr.us-east-1.amazonaws.com
           ECR_REPOSITORY: testecr
           IMAGE_TAG: ${{ github.sha }}  # Set IMAGE_TAG to latest commit ID
         run: |
