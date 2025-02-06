@@ -1,14 +1,30 @@
-# Dockerfile
-FROM node:14
+# Step 1: Use a base image that includes Node.js
+FROM node:16 as build
 
-WORKDIR /usr/src/app
+# Set working directory in the container
+WORKDIR /app
 
-COPY package*.json ./
-
+# Copy package.json and install dependencies
+COPY package.json package-lock.json ./
 RUN npm install
 
+# Copy the rest of the app's code
 COPY . .
 
-EXPOSE 3000
+# Step 2: Build the app (if applicable)
+RUN npm run build
 
-CMD ["node", "app.js"]
+# Step 3: Use a new image with Nginx
+FROM nginx:alpine
+
+# Copy Nginx configuration file
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy the Node.js app (built) into the Nginx folder
+COPY --from=build /app /usr/share/nginx/html
+
+# Expose port for the app
+EXPOSE 80
+
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]
