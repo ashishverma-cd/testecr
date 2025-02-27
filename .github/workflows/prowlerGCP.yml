@@ -58,9 +58,9 @@ on:
       GCP_PROJECT_NUMBER:
         required: true
         description: 'GCP Project Number'
-      GCP_CREDENTIALS:
+      SERVICE_ACCOUNT:
         required: true
-        description: 'Google Cloud Service Account JSON key'
+        description: 'Google Cloud Service Account Email'
       WIP:
         required: true
         description: 'Workload Identity Provider name'
@@ -94,18 +94,20 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Authenticate with Google Cloud using Service Account JSON
-        run: |
-          echo "${{ secrets.GCP_CREDENTIALS }}" > /tmp/gcp_credentials.json
-          gcloud auth activate-service-account --key-file=/tmp/gcp_credentials.json
-          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
-      
+      - name: Authenticate with Google Cloud using Workload Identity Federation
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: "projects/295233741425/locations/global/workloadIdentityPools/prowler/providers/reposrts"
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          access_token_lifetime: 300s
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: Install Google Cloud SDK
         run: |
           echo "Installing Google Cloud SDK..."
           curl https://sdk.cloud.google.com | bash
           source $HOME/google-cloud-sdk/path.bash.inc
-          # No need to authenticate again since we've done it earlier
+          gcloud auth activate-service-account --key-file=${{ secrets.GCP_CREDENTIALS }}
           gcloud config set project ${{ inputs.gcp_project_id }}
 
 
