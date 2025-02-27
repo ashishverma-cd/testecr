@@ -127,22 +127,22 @@ jobs:
       #       --role="roles/iam.workloadIdentityUser" \
       #       --member="principalSet://iam.googleapis.com/projects/${{ secrets.GCP_PROJECT_ID }}/locations/global/workloadIdentityPools/${{ secrets.Workload_Identity_pool }}/attribute.repository/${{ secrets.GITHUB_REPO }}"
 
-      - name: Create Workload Identity Pool Provider (OIDC)
-        run: |
-          gcloud iam workload-identity-pools providers create-oidc "${{ secrets.OIDC_provider }}" \
-            --project="${{ secrets.GCP_PROJECT_ID }}" \
-            --location="global" \
-            --workload-identity-pool="${{ secrets.Workload_Identity_Pool }}" \
-            --display-name="${{ secrets.OIDC_provider }}" \
-            --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.aud=assertion.aud" \
-            --issuer-uri="https://token.actions.githubusercontent.com"
+      # - name: Create Workload Identity Pool Provider (OIDC)
+      #   run: |
+      #     gcloud iam workload-identity-pools providers create-oidc "${{ secrets.OIDC_provider }}" \
+      #       --project="${{ secrets.GCP_PROJECT_ID }}" \
+      #       --location="global" \
+      #       --workload-identity-pool="${{ secrets.Workload_Identity_Pool }}" \
+      #       --display-name="${{ secrets.OIDC_provider }}" \
+      #       --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.aud=assertion.aud" \
+      #       --issuer-uri="https://token.actions.githubusercontent.com"
 
-      - name: Create Workload Identity Pool
-        run: |
-          gcloud iam workload-identity-pools create "${{ secrets.Workload_Identity_Pool }}" \
-            --project="${{ secrets.GCP_PROJECT_ID }}" \
-            --location="global" \
-            --display-name="${{ secrets.Workload_Identity_Pool }}"
+      # - name: Create Workload Identity Pool
+      #   run: |
+      #     gcloud iam workload-identity-pools create "${{ secrets.Workload_Identity_Pool }}" \
+      #       --project="${{ secrets.GCP_PROJECT_ID }}" \
+      #       --location="global" \
+      #       --display-name="${{ secrets.Workload_Identity_Pool }}"
 
       - name: Running Prowler for GCP
         env:
