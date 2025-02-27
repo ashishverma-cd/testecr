@@ -103,22 +103,25 @@ jobs:
           access_token_lifetime: 300s
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Install GCP SDK
-        if: ${{ inputs.cloud_provider == 'gcp' }}
-        run: |
-          curl https://sdk.cloud.google.com | bash
-          source $HOME/google-cloud-sdk/path.bash.inc
-          gcloud components install beta
-
       - name: Install pip
         run: |
           sudo apt update
           sudo apt install -y python3 python3-pip
 
-      # - name: Install Prowler
-      #   run: |
-      #     python3 -m pip install --upgrade pip
-      #     pip3 install prowler
+      - name: Install Prowler
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install prowler
+
+       - name: Install Google Cloud SDK
+        if: ${{ inputs.cloud_provider == 'gcp' }}
+        run: |
+          echo "Installing Google Cloud SDK..."
+          curl https://sdk.cloud.google.com | bash
+          source $HOME/google-cloud-sdk/path.bash.inc
+          gcloud auth activate-service-account --key-file=${{ secrets.GCP_CREDENTIALS }}
+          gcloud config set project ${{ inputs.gcp_project_id }}      
+
 
       # - name: Set IAM Policy Binding
       #   run: |
@@ -161,32 +164,32 @@ jobs:
       #     }
       #     done
 
-      - name: Install and Run Prowler
-        run: |
-          pip install prowler==4.2.4
-          prowler -v
-          prowler gcp --project-ids ${{ secrets.PROJECT_ID }}
-        continue-on-error: true
+      # - name: Install and Run Prowler
+      #   run: |
+      #     pip install prowler==4.2.4
+      #     prowler -v
+      #     prowler gcp --project-ids ${{ secrets.PROJECT_ID }}
+      #   continue-on-error: true
 
-      - name: Upload data to artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: compliance-output
-          path: output/
+      # - name: Upload data to artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: compliance-output
+      #     path: output/
 
-      - name: Upload Prowler Results to GCS
-        if: ${{ inputs.enable_gcs_upload == true }}
-        run: |
-          YEAR=$(date +'%Y')
-          MONTH=$(date +'%m')
-          gsutil cp -r /home/runner/work/prowler/prowler/output/ gs://${{ secrets.GCS_BUCKET_NAME }}/$YEAR/$MONTH/
+      # - name: Upload Prowler Results to GCS
+      #   if: ${{ inputs.enable_gcs_upload == true }}
+      #   run: |
+      #     YEAR=$(date +'%Y')
+      #     MONTH=$(date +'%m')
+      #     gsutil cp -r /home/runner/work/prowler/prowler/output/ gs://${{ secrets.GCS_BUCKET_NAME }}/$YEAR/$MONTH/
 
-      - name: 'Notify Slack'
-        uses: clouddrove/action-slack-notify@1
-        if: ${{ inputs.enable_slack_notification == true }}
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: ${{ inputs.SLACK_MESSAGE }}
-          SLACK_ENV: ${{ inputs.SLACK_ENV }}
-          SLACK_USERNAME: ${{ secrets.SLACK_USERNAME }}
-          SLACK_COLOR: ${{ job.status == 'success' && 'good' || job.status == 'failure' && 'danger' || 'warning' }}
+      # - name: 'Notify Slack'
+      #   uses: clouddrove/action-slack-notify@1
+      #   if: ${{ inputs.enable_slack_notification == true }}
+      #   env:
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      #     SLACK_MESSAGE: ${{ inputs.SLACK_MESSAGE }}
+      #     SLACK_ENV: ${{ inputs.SLACK_ENV }}
+      #     SLACK_USERNAME: ${{ secrets.SLACK_USERNAME }}
+      #     SLACK_COLOR: ${{ job.status == 'success' && 'good' || job.status == 'failure' && 'danger' || 'warning' }}
