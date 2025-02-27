@@ -61,7 +61,7 @@ on:
       SERVICE_ACCOUNT:
         required: true
         description: 'Google Cloud Service Account Email'
-      WIP: 
+      WIP:
         required: true
         description: 'Workload Identity Provider name'
       Your_WIP_Name:
@@ -112,84 +112,3 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip3 install prowler
-
-       - name: Install Google Cloud SDK
-        if: ${{ inputs.cloud_provider == 'gcp' }}
-        run: |
-          echo "Installing Google Cloud SDK..."
-          curl https://sdk.cloud.google.com | bash
-          source $HOME/google-cloud-sdk/path.bash.inc
-          gcloud auth activate-service-account --key-file=${{ secrets.GCP_CREDENTIALS }}
-          gcloud config set project ${{ inputs.gcp_project_id }}      
-
-
-      # - name: Set IAM Policy Binding
-      #   run: |
-      #     gcloud iam service-accounts add-iam-policy-binding "${{ secrets.SERVICE_ACCOUNT }}" \
-      #       --project="${{ secrets.GCP_PROJECT_ID }}" \
-      #       --role="roles/iam.workloadIdentityUser" \
-      #       --member="principalSet://iam.googleapis.com/projects/${{ secrets.GCP_PROJECT_ID }}/locations/global/workloadIdentityPools/${{ secrets.Workload_Identity_pool }}/attribute.repository/${{ secrets.GITHUB_REPO }}"
-
-      # - name: Create Workload Identity Pool Provider (OIDC)
-      #   run: |
-      #     gcloud iam workload-identity-pools providers create-oidc "${{ secrets.OIDC_provider }}" \
-      #       --project="${{ secrets.GCP_PROJECT_ID }}" \
-      #       --location="global" \
-      #       --workload-identity-pool="${{ secrets.Workload_Identity_Pool }}" \
-      #       --display-name="${{ secrets.OIDC_provider }}" \
-      #       --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.aud=assertion.aud" \
-      #       --issuer-uri="https://token.actions.githubusercontent.com"
-
-      # - name: Create Workload Identity Pool
-      #   run: |
-      #     gcloud iam workload-identity-pools create "${{ secrets.Workload_Identity_Pool }}" \
-      #       --project="${{ secrets.GCP_PROJECT_ID }}" \
-      #       --location="global" \
-      #       --display-name="${{ secrets.Workload_Identity_Pool }}"
-
-      # - name: Running Prowler for GCP
-      #   env:
-      #     PROJECT_ID: ${{ inputs.GCP_PROJECT_ID }}
-      #   run: |
-      #     export MONTH_NAME=$(date +%B)
-      #     for PROJECTID in $PROJECT_ID; do
-      #     {
-      #       echo "Scanning GCP Project: $PROJECTID"
-      #       PROWLER_CMD="prowler gcp \
-      #         --project-id ${PROJECTID} \
-      #         --output-directory /home/runner/work/prowler/prowler/output/$MONTH_NAME \
-      #         --output-modes html csv json-asff \
-      #         --ignore-exit-code-3"
-      #       eval $PROWLER_CMD
-      #     }
-      #     done
-
-      # - name: Install and Run Prowler
-      #   run: |
-      #     pip install prowler==4.2.4
-      #     prowler -v
-      #     prowler gcp --project-ids ${{ secrets.PROJECT_ID }}
-      #   continue-on-error: true
-
-      # - name: Upload data to artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: compliance-output
-      #     path: output/
-
-      # - name: Upload Prowler Results to GCS
-      #   if: ${{ inputs.enable_gcs_upload == true }}
-      #   run: |
-      #     YEAR=$(date +'%Y')
-      #     MONTH=$(date +'%m')
-      #     gsutil cp -r /home/runner/work/prowler/prowler/output/ gs://${{ secrets.GCS_BUCKET_NAME }}/$YEAR/$MONTH/
-
-      # - name: 'Notify Slack'
-      #   uses: clouddrove/action-slack-notify@1
-      #   if: ${{ inputs.enable_slack_notification == true }}
-      #   env:
-      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-      #     SLACK_MESSAGE: ${{ inputs.SLACK_MESSAGE }}
-      #     SLACK_ENV: ${{ inputs.SLACK_ENV }}
-      #     SLACK_USERNAME: ${{ secrets.SLACK_USERNAME }}
-      #     SLACK_COLOR: ${{ job.status == 'success' && 'good' || job.status == 'failure' && 'danger' || 'warning' }}
