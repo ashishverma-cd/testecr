@@ -123,10 +123,9 @@ jobs:
       #   run: |
       #         export DATE_TIME=$(date +'%B-%d-%Y_%H-%M-%S')
       #         PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/reports/$DATE_TIME --output-modes html csv json-asff"  
-      - name: Install and Run Prowler
+      - name: Running Prowler for GCP
         run: |
-          prowler -v
-          prowler gcp --project-ids ${{ secrets.PROJECT_ID }}
-          export DATE_TIME=$(date +'%B-%d-%Y_%H-%M-%S')
-          PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/reports/$DATE_TIME --output-modes html csv json-asff"
+          export MONTH_NAME=$(date +%B)
+          PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/prowler/output/$MONTH_NAME --output-modes html csv json-asff"
+          eval $PROWLER_CMD
           continue-on-error: true
