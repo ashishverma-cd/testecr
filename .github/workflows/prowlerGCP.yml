@@ -105,39 +105,22 @@ jobs:
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
           access_token_lifetime: 300s
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-
+          
       - name: Debug Google Cloud Project
         run: |
           echo "GCP Project ID: ${{ secrets.GCP_PROJECT_ID }}"
           gcloud auth list
           gcloud projects describe ${{ secrets.GCP_PROJECT_ID }}
-
       - name: Install pip
         run: |
           sudo apt update
           sudo apt install -y python3 python3-pip
-
       - name: Install Prowler
         run: |
           python3 -m pip install --upgrade pip
           pip3 install prowler
-
       - name: Running Prowler for GCP
-        env:
-          PROJECT_ID: ${{ inputs.gcp_project_id }}
         run: |
-          # Get the current month, day, year, hour, minute, and second
-          export DATE_TIME=$(date +'%B-%d-%Y_%H-%M-%S')
-
-          for PROJECTID in $PROJECT_ID; do
-            echo "Scanning GCP Project: $PROJECTID"
-
-            # Run Prowler command with updated directory path
-            PROWLER_CMD="prowler gcp \
-              --project-id ${PROJECTID} \
-              --output-directory /home/runner/work/prowler/prowler/output/$DATE_TIME \
-              --output-modes html csv json-asff \
-              --ignore-exit-code-3"
-            eval $PROWLER_CMD
-          done
-
+          export MONTH_NAME=$(date +%B)
+          PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/prowler/output/$MONTH_NAME --output-modes html csv json-asff"
+          eval $PROWLER_CMD
