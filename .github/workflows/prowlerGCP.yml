@@ -172,8 +172,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: compliance-output
-          path: /home/runner/work/testecr/testecr/
-          
+          path: /home/runner/work/testecr/testecr/output/
 
       - name: Upload Prowler Results to GCS
         if: ${{ inputs.enable_gcs_upload == true }}
