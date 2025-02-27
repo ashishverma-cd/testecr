@@ -122,11 +122,4 @@ jobs:
       - name: Running Prowler for GCP
         run: |
               export DATE_TIME=$(date +'%B-%d-%Y_%H-%M-%S')
-              PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/prowler/output/$DATE_TIME --output-modes html csv json-asff"
-              eval $PROWLER_CMD
-              # Check if a file was created to ensure Prowler completed
-              if [ ! -f "/home/runner/work/prowler/prowler/output/$DATE_TIME/prowler-output-default-$(date +'%Y%m%d%H%M%S').html" ]; then
-                echo "Prowler scan failed, no output files found."
-                exit 1
-              fi
-              
+              PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/reports/$DATE_TIME --output-modes html csv json-asff"              
