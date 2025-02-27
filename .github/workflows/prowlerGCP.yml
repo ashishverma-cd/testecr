@@ -109,14 +109,15 @@ jobs:
       - name: Authenticate with Google Cloud using Service Account
         run: |
           echo "Authenticating with GCP..."
-          # Save GCP_CREDENTIALS secret directly to a file
-          echo "${{ secrets.GCP_CREDENTIALS }}" > /tmp/gcp-credentials.json
+          # Save GCP_CREDENTIALS secret directly to a file using printf (to handle multiline JSON properly)
+          printf "%s" "${{ secrets.GCP_CREDENTIALS }}" > /tmp/gcp-credentials.json
           # Check if the file was created successfully
           ls -l /tmp/gcp-credentials.json
           # Authenticate using the service account key
           gcloud auth activate-service-account --key-file=/tmp/gcp-credentials.json
           # Set the project for gcloud
           gcloud config set project ${{ inputs.gcp_project_id }}
+
 
 
 
