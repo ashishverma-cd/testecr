@@ -120,12 +120,12 @@ jobs:
           python3 -m pip install --upgrade pip
           pip3 install prowler
 
-      - name: Set IAM Policy Binding
-        run: |
-          gcloud iam service-accounts add-iam-policy-binding "${{ secrets.SERVICE_ACCOUNT }}" \
-            --project="${{ secrets.GCP_PROJECT_ID }}" \
-            --role="roles/iam.workloadIdentityUser" \
-            --member="principalSet://iam.googleapis.com/projects/${{ secrets.GCP_PROJECT_ID }}/locations/global/workloadIdentityPools/${{ secrets.Workload_Identity_pool }}/attribute.repository/${{ secrets.GITHUB_REPO }}"
+      # - name: Set IAM Policy Binding
+      #   run: |
+      #     gcloud iam service-accounts add-iam-policy-binding "${{ secrets.SERVICE_ACCOUNT }}" \
+      #       --project="${{ secrets.GCP_PROJECT_ID }}" \
+      #       --role="roles/iam.workloadIdentityUser" \
+      #       --member="principalSet://iam.googleapis.com/projects/${{ secrets.GCP_PROJECT_ID }}/locations/global/workloadIdentityPools/${{ secrets.Workload_Identity_pool }}/attribute.repository/${{ secrets.GITHUB_REPO }}"
 
       - name: Create Workload Identity Pool Provider (OIDC)
         run: |
