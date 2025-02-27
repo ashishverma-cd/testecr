@@ -94,6 +94,22 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
+      - name: Authenticate with Google Cloud using Workload Identity Federation
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: "projects/my-project-44865-424207/locations/global/workloadIdentityPools/prowler/providers/reports"
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          access_token_lifetime: 300s
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Install GCP SDK
+        if: ${{ inputs.cloud_provider == 'gcp' }}
+        run: |
+          curl https://sdk.cloud.google.com | bash
+          source $HOME/google-cloud-sdk/path.bash.inc
+          gcloud components install beta
+
       - name: Install pip
         run: |
           sudo apt update
@@ -103,22 +119,6 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip3 install prowler
-
-      - name: Install GCP SDK
-        if: ${{ inputs.cloud_provider == 'gcp' }}
-        run: |
-          curl https://sdk.cloud.google.com | bash
-          source $HOME/google-cloud-sdk/path.bash.inc
-          gcloud components install beta
-
-      - name: Authenticate with Google Cloud using Workload Identity Federation
-        uses: google-github-actions/auth@v1
-        with:
-          token_format: access_token
-          workload_identity_provider: ${{ secrets.OIDC_provider }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT }}
-          access_token_lifetime: 300s
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Set IAM Policy Binding
         run: |
@@ -143,7 +143,6 @@ jobs:
             --project="${{ secrets.GCP_PROJECT_ID }}" \
             --location="global" \
             --display-name="${{ secrets.Workload_Identity_Pool }}"
-
 
       - name: Running Prowler for GCP
         env:
