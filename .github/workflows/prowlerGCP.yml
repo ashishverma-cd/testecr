@@ -82,6 +82,9 @@ on:
       SLACK_USERNAME:
         required: false
         description: 'Slack username for notifications'
+      GCP_CREDENTIALS:  # Add this secret to the list
+        required: true
+        description: 'Service account credentials for Google Cloud'
 
 jobs:
   prowler:
@@ -102,14 +105,16 @@ jobs:
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
           access_token_lifetime: 300s
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+        
       - name: Install Google Cloud SDK
         run: |
           echo "Installing Google Cloud SDK..."
           curl https://sdk.cloud.google.com | bash
           source $HOME/google-cloud-sdk/path.bash.inc
-          gcloud auth activate-service-account --key-file=${{ secrets.GCP_CREDENTIALS }}
+          gcloud auth activate-service-account --key-file="${{ secrets.GCP_CREDENTIALS }}"
           gcloud config set project ${{ inputs.gcp_project_id }}
-
+          
+      # Add further steps here for prowler setup and execution
 
       # - name: Install pip
       #   run: |
