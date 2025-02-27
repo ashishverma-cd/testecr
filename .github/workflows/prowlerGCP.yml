@@ -115,10 +115,10 @@ jobs:
           sudo apt update
           sudo apt install -y python3 python3-pip
 
-      - name: Install Prowler
-        run: |
-          python3 -m pip install --upgrade pip
-          pip3 install prowler
+      # - name: Install Prowler
+      #   run: |
+      #     python3 -m pip install --upgrade pip
+      #     pip3 install prowler
 
       # - name: Set IAM Policy Binding
       #   run: |
@@ -144,22 +144,29 @@ jobs:
       #       --location="global" \
       #       --display-name="${{ secrets.Workload_Identity_Pool }}"
 
-      - name: Running Prowler for GCP
-        env:
-          PROJECT_ID: ${{ inputs.GCP_PROJECT_ID }}
+      # - name: Running Prowler for GCP
+      #   env:
+      #     PROJECT_ID: ${{ inputs.GCP_PROJECT_ID }}
+      #   run: |
+      #     export MONTH_NAME=$(date +%B)
+      #     for PROJECTID in $PROJECT_ID; do
+      #     {
+      #       echo "Scanning GCP Project: $PROJECTID"
+      #       PROWLER_CMD="prowler gcp \
+      #         --project-id ${PROJECTID} \
+      #         --output-directory /home/runner/work/prowler/prowler/output/$MONTH_NAME \
+      #         --output-modes html csv json-asff \
+      #         --ignore-exit-code-3"
+      #       eval $PROWLER_CMD
+      #     }
+      #     done
+
+      - name: Install and Run Prowler
         run: |
-          export MONTH_NAME=$(date +%B)
-          for PROJECTID in $PROJECT_ID; do
-          {
-            echo "Scanning GCP Project: $PROJECTID"
-            PROWLER_CMD="prowler gcp \
-              --project-id ${PROJECTID} \
-              --output-directory /home/runner/work/prowler/prowler/output/$MONTH_NAME \
-              --output-modes html csv json-asff \
-              --ignore-exit-code-3"
-            eval $PROWLER_CMD
-          }
-          done
+          pip install prowler==4.2.4
+          prowler -v
+          prowler gcp --project-ids ${{ secrets.PROJECT_ID }}
+        continue-on-error: true
 
       - name: Upload data to artifact
         uses: actions/upload-artifact@v4
