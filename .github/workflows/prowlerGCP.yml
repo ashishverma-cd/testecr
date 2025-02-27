@@ -98,7 +98,7 @@ jobs:
         uses: google-github-actions/auth@v1
         with:
           token_format: access_token
-          workload_identity_provider: "projects/my-project-44865-424207/locations/global/workloadIdentityPools/prowler/providers/reports"
+          workload_identity_provider: "projects/295233741425/locations/global/workloadIdentityPools/prowler/providers/reposrts"
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
           access_token_lifetime: 300s
           project_id: ${{ secrets.GCP_PROJECT_ID }}
