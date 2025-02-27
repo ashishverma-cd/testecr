@@ -97,69 +97,27 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      # - name: Authenticate with Google Cloud using Workload Identity Federation
-      #   uses: google-github-actions/auth@v1
-      #   with:
-      #     token_format: access_token
-      #     workload_identity_provider: "projects/295233741425/locations/global/workloadIdentityPools/prowler/providers/reposrts"
-      #     service_account: ${{ secrets.SERVICE_ACCOUNT }}
-      #     access_token_lifetime: 300s
-      #     project_id: ${{ secrets.GCP_PROJECT_ID }}
+      - name: Authenticate with Google Cloud using Workload Identity Federation
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: "projects/295233741425/locations/global/workloadIdentityPools/prowler/providers/reposrts"
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          access_token_lifetime: 300s
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      # - name: Authenticate with Google Cloud using Service Account
-      #   run: |
-      #     echo "Authenticating with GCP..."
-      #     # Save the GCP_CREDENTIALS secret directly to a file (ensure correct formatting)
-      #     printf "%s" "${{ secrets.GCP_CREDENTIALS }}" > /tmp/gcp-credentials.json
-          
-      #     # Check if the file was created successfully
-      #     ls -l /tmp/gcp-credentials.json
-      #     cat /tmp/gcp-credentials.json  # Debugging step to check the file content
-      
-      #     # Authenticate using the service account key
-      #     gcloud auth activate-service-account --key-file=/tmp/gcp-credentials.json
-          
-      #     # Set the project for gcloud
-      #     gcloud config set project ${{ inputs.gcp_project_id }}
-      - name: Authenticate with GCP
+      - name: Install pip
         run: |
-          echo "Authenticating with GCP..."
-  
-          # Save the GCP_CREDENTIALS secret directly to a file (ensure correct formatting)
-          printf "%s" "${{ secrets.GCP_CREDENTIALS }}" > /tmp/gcp-credentials.json
-  
-          # Check the file content to ensure it's correct (debugging step)
-          cat /tmp/gcp-credentials.json
-  
-          # Validate JSON format (optional step)
-          jq empty /tmp/gcp-credentials.json || exit 1  # This will fail if JSON is invalid
-  
-          # Authenticate using the service account key
-          gcloud auth activate-service-account --key-file=/tmp/gcp-credentials.json
-  
-          # Set the project for gcloud
-          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+          sudo apt update
+          sudo apt install -y python3 python3-pip
 
-
-
-
-      - name: Install Google Cloud SDK
+      - name: Install Prowler
         run: |
-          echo "Installing Google Cloud SDK..."
-          curl https://sdk.cloud.google.com | bash
-          source $HOME/google-cloud-sdk/path.bash.inc
-          gcloud auth activate-service-account --key-file="${{ secrets.GCP_CREDENTIALS }}"
-          gcloud config set project ${{ inputs.gcp_project_id }}
-      # Add further steps here for prowler setup and execution
+          python3 -m pip install --upgrade pip
+          pip3 install prowler
 
-      # - name: Install pip
-      #   run: |
-      #     sudo apt update
-      #     sudo apt install -y python3 python3-pip
-
-      # - name: Install Prowler
-      #   run: |
-      #     python3 -m pip install --upgrade pip
-      #     pip3 install prowler
-
-
+      - name: Running Prowler for GCP
+        run: |
+          export MONTH_NAME=$(date +%B)
+          PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/prowler/output/$MONTH_NAME --output-modes html csv json-asff"
+          eval $PROWLER_CMD
