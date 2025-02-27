@@ -82,7 +82,7 @@ on:
       SLACK_USERNAME:
         required: false
         description: 'Slack username for notifications'
-      GCP_CREDENTIALS:
+      GCP_CREDENTIALS:  # Add this secret to the list
         required: true
         description: 'Service account credentials for Google Cloud'
 
@@ -97,21 +97,30 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
+      - name: Authenticate with Google Cloud using Workload Identity Federation
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: "projects/295233741425/locations/global/workloadIdentityPools/prowler/providers/reposrts"
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          access_token_lifetime: 300s
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
       - name: Authenticate with Google Cloud using Service Account
         run: |
           echo "Authenticating with GCP..."
-          # Save GCP_CREDENTIALS secret to a file
-          echo "${{ secrets.GCP_CREDENTIALS }}" > /tmp/gcp-credentials.json
-          # Authenticate with gcloud using the saved credentials
+          # Directly authenticate using GCP credentials in environment variable
+          echo "${{ secrets.GCP_CREDENTIALS }}" | base64 --decode > /tmp/gcp-credentials.json
           gcloud auth activate-service-account --key-file=/tmp/gcp-credentials.json
           gcloud config set project ${{ inputs.gcp_project_id }}
-
+        
       - name: Install Google Cloud SDK
         run: |
           echo "Installing Google Cloud SDK..."
           curl https://sdk.cloud.google.com | bash
           source $HOME/google-cloud-sdk/path.bash.inc
-          
+          gcloud auth activate-service-account --key-file="${{ secrets.GCP_CREDENTIALS }}"
+          gcloud config set project ${{ inputs.gcp_project_id }}
       # Add further steps here for prowler setup and execution
 
       # - name: Install pip
