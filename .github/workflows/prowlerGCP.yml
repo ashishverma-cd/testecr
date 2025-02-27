@@ -102,6 +102,15 @@ jobs:
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
           access_token_lifetime: 300s
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+          
+      - name: Install Google Cloud SDK
+        if: ${{ inputs.cloud_provider == 'gcp' }}
+        run: |
+          echo "Installing Google Cloud SDK..."
+          curl https://sdk.cloud.google.com | bash
+          source $HOME/google-cloud-sdk/path.bash.inc
+          gcloud auth activate-service-account --key-file=${{ secrets.GCP_CREDENTIALS }}
+          gcloud config set project ${{ inputs.gcp_project_id }}
 
       - name: Install pip
         run: |
@@ -112,3 +121,5 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip3 install prowler
+
+
