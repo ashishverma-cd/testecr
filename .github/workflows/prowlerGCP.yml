@@ -162,7 +162,7 @@ jobs:
           done
 
       - name: Upload data to artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: compliance-output
           path: /home/runner/work/testecr/testecr/prowler/
