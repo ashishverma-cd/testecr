@@ -105,6 +105,12 @@ jobs:
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
           access_token_lifetime: 300s
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+          
+      - name: Debug Google Cloud Project
+        run: |
+          echo "GCP Project ID: ${{ secrets.GCP_PROJECT_ID }}"
+          gcloud auth list
+          gcloud projects describe ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Install pip
         run: |
