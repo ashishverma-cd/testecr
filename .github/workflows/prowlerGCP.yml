@@ -82,7 +82,7 @@ on:
       SLACK_USERNAME:
         required: false
         description: 'Slack username for notifications'
-      GCP_CREDENTIALS:
+      GCP_CREDENTIALS:  # Add this secret to the list
         required: true
         description: 'Service account credentials for Google Cloud'
 
@@ -106,6 +106,12 @@ jobs:
           access_token_lifetime: 300s
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
+      - name: Debug Google Cloud Project
+        run: |
+          echo "GCP Project ID: ${{ secrets.GCP_PROJECT_ID }}"
+          gcloud auth list
+          gcloud projects describe ${{ secrets.GCP_PROJECT_ID }}
+
       - name: Install pip
         run: |
           sudo apt update
@@ -122,27 +128,28 @@ jobs:
         run: |
           # Get the current month, day, year, hour, minute, and second
           export DATE_TIME=$(date +'%B-%d-%Y_%H-%M-%S')
-          
+
           for PROJECTID in $PROJECT_ID; do
             echo "Scanning GCP Project: $PROJECTID"
-            
+
             # Run Prowler command with updated directory path
             PROWLER_CMD="prowler gcp \
               --project-id ${PROJECTID} \
               --output-directory /home/runner/work/prowler/prowler/output/$DATE_TIME \
               --output-modes html csv json-asff \
               --ignore-exit-code-3"
-              
+
             eval $PROWLER_CMD
           done
-    
+
       - name: Upload Artifact
         if: ${{ inputs.enable_gcs_upload == false }}
         uses: actions/upload-artifact@v4
         with:
           name: prowler-reports
           path: /home/runner/work/prowler/prowler/output/
-    
+          retention-days: ${{ inputs.retention_days | toString }}
+
       - name: Upload Prowler Results to GCS
         if: ${{ inputs.enable_gcs_upload == true }}
         run: |
@@ -150,7 +157,7 @@ jobs:
           MONTH=$(date +'%m')
           # Copy reports to GCS bucket with year/month structure
           gsutil cp -r /home/runner/work/prowler/prowler/output/ gs://${{ secrets.GCS_BUCKET_NAME }}/$YEAR/$MONTH/
-    
+
       - name: 'Notify Slack'
         uses: clouddrove/action-slack-notify@1
         if: ${{ inputs.enable_slack_notification == true }}
