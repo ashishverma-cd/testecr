@@ -132,12 +132,6 @@ jobs:
           name: prowler-reports
           path: /home/runner/work/prowler/reports/
       
-      # - name: Install Google Cloud SDK
-      #   run: |
-      #     curl https://sdk.cloud.google.com | bash
-      #     source $HOME/google-cloud-sdk/path.bash.inc
-      #     gcloud components update
-
   
       - name: Upload reports to GCS
         run: |
@@ -145,10 +139,8 @@ jobs:
           GCS_BUCKET_NAME="prowler-reports"
           echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
         
-          # Ensure the DATE_TIME variable is defined
           DATE_TIME="${DATE_TIME:-$(date +'%B-%d-%Y')}"
-        
-          # Use the generated date-time directory in the reports path
+       
           REPORT_DIRECTORY="/home/runner/work/prowler/reports"
           
           # Check if the compliance-output directory exists and upload it to the GCS bucket
