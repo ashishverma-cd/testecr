@@ -132,10 +132,11 @@ jobs:
           name: prowler-reports
           path: /home/runner/work/prowler/reports/
       
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2  # Updated to v2
-        with:
-          version: '355.0.0'
+      - name: Install Google Cloud SDK
+        run: |
+          curl https://sdk.cloud.google.com | bash
+          source $HOME/google-cloud-sdk/path.bash.inc
+          gcloud components update
   
       - name: Authenticate with Google Cloud using Workload Identity Federation
         uses: google-github-actions/auth@v1
