@@ -119,15 +119,11 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip3 install prowler
-      # - name: Running Prowler for GCP
-      #   run: |
-      #         export DATE_TIME=$(date +'%B-%d-%Y_%H-%M-%S')
-      #         PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/reports/$DATE_TIME --output-modes html csv json-asff"  
+
       - name: Running Prowler for GCP
         run: |
           export MONTH_NAME=$(date +%B)
           PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/prowler/output/$MONTH_NAME --output-modes html csv json-asff"
-          eval $PROWLER_CMD
           continue-on-error: true
       - name: Check if Prowler report files exist
         run: |
