@@ -118,8 +118,7 @@ jobs:
           sudo apt install -y python3 python3-pip
           python3 -m pip install --upgrade pip
           pip3 install prowler
-          
- 
+
       - name: Running Prowler for GCP
         run: |
           export DATE_TIME=$(date +'%B-%d-%Y_%H-%M-%S')
@@ -127,8 +126,22 @@ jobs:
           eval $PROWLER_CMD
         continue-on-error: true
 
+      # Upload reports to GCS
+      - name: Upload reports to GCS
+        if: ${{ secrets.GCS_BUCKET_NAME != '' && enable_gcs_upload == true }}
+        run: |
+          echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
+
+          # Use the generated date-time directory in the reports path
+          REPORT_DIRECTORY="/home/runner/work/prowler/reports/$DATE_TIME"
+
+          # Upload each file (json, csv, html) to the GCS bucket
+          gsutil cp $REPORT_DIRECTORY/*.json gs://${{ secrets.GCS_BUCKET_NAME }}/
+          gsutil cp $REPORT_DIRECTORY/*.csv gs://${{ secrets.GCS_BUCKET_NAME }}/
+          gsutil cp $REPORT_DIRECTORY/*.html gs://${{ secrets.GCS_BUCKET_NAME }}/
+        
       - name: Upload data to artifact
         uses: actions/upload-artifact@v4
         with:
           name: compliance-output
-          path: output/
+          path: /home/runner/work/prowler/reports/$DATE_TIME/
