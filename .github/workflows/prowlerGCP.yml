@@ -126,9 +126,9 @@ jobs:
           eval $PROWLER_CMD
         continue-on-error: true
 
-      # Upload reports to GCS
+      # Upload reports to GCS only if the GCS_BUCKET_NAME secret and enable_gcs_upload flag are set
       - name: Upload reports to GCS
-        if: ${{ secrets.GCS_BUCKET_NAME != '' && enable_gcs_upload == true }}
+        if: ${{ github.event.inputs.enable_gcs_upload == true && secrets.GCS_BUCKET_NAME }}
         run: |
           echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
 
@@ -139,9 +139,10 @@ jobs:
           gsutil cp $REPORT_DIRECTORY/*.json gs://${{ secrets.GCS_BUCKET_NAME }}/
           gsutil cp $REPORT_DIRECTORY/*.csv gs://${{ secrets.GCS_BUCKET_NAME }}/
           gsutil cp $REPORT_DIRECTORY/*.html gs://${{ secrets.GCS_BUCKET_NAME }}/
-        
+
       - name: Upload data to artifact
         uses: actions/upload-artifact@v4
         with:
           name: compliance-output
           path: /home/runner/work/prowler/reports/$DATE_TIME/
+
