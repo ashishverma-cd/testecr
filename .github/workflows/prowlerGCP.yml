@@ -139,7 +139,7 @@ jobs:
           GCS_BUCKET_NAME="prowler-reports"
           echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
         
-          # Ensure the DATE_TIME variable is defined
+          # Ensure the DATE_TIME variable is defined#
           DATE_TIME="${DATE_TIME:-$(date +'%B-%d-%Y')}"
         
           # Use the generated date-time directory in the reports path
