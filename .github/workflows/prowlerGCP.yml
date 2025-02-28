@@ -138,6 +138,9 @@ jobs:
           GCS_BUCKET_NAME="prowler-reports"
           echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
 
+          # Ensure the DATE_TIME variable is properly defined, or provide a fallback
+          DATE_TIME="${DATE_TIME:-$(date +'%B-%d-%Y_%H-%M-%S')}"
+          
           # Use the generated date-time directory in the reports path
           REPORT_DIRECTORY="/home/runner/work/prowler/reports/$DATE_TIME"
 
@@ -146,13 +149,13 @@ jobs:
             echo "Found report directory, uploading to GCS..."
 
             # Upload JSON files to GCS bucket
-            gsutil cp $REPORT_DIRECTORY/*.json gs://${GCS_BUCKET_NAME}/
+            gsutil cp "$REPORT_DIRECTORY"/*.json gs://${GCS_BUCKET_NAME}/
 
             # Upload CSV files to GCS bucket
-            gsutil cp $REPORT_DIRECTORY/*.csv gs://${GCS_BUCKET_NAME}/
+            gsutil cp "$REPORT_DIRECTORY"/*.csv gs://${GCS_BUCKET_NAME}/
 
             # Upload HTML files to GCS bucket
-            gsutil cp $REPORT_DIRECTORY/*.html gs://${GCS_BUCKET_NAME}/
+            gsutil cp "$REPORT_DIRECTORY"/*.html gs://${GCS_BUCKET_NAME}/
 
             echo "Reports successfully uploaded to GCS bucket ${GCS_BUCKET_NAME}."
           else
