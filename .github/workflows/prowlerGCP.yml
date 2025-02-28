@@ -111,17 +111,54 @@ jobs:
           echo "GCP Project ID: ${{ secrets.GCP_PROJECT_ID }}"
           gcloud auth list
           gcloud projects describe ${{ secrets.GCP_PROJECT_ID }}
-      - name: Install pip
+
+
+      - name: Install pip and Prowler
         run: |
           sudo apt update
           sudo apt install -y python3 python3-pip
-      - name: Install Prowler
-        run: |
           python3 -m pip install --upgrade pip
           pip3 install prowler
-      - name: Running Prowler for GCP
+
+      - name: Run Prowler for GCP and Generate Reports
         run: |
-      - name: Running Prowler for GCP
+          # Get the current month
+          export MONTH_NAME=$(date +%B)
+
+          # Define the output directory for the reports
+          OUTPUT_DIR="/home/runner/work/prowler/prowler/output/$MONTH_NAME"
+
+          # Create the output directory if it doesn't exist
+          mkdir -p "$OUTPUT_DIR"
+
+          # Run Prowler with specified output modes
+          PROWLER_CMD="prowler gcp --output-directory $OUTPUT_DIR --output-modes html csv json-asff"
+
+          # Execute the Prowler command
+          eval $PROWLER_CMD
+
+          # Define report filenames
+          REPORT_HTML="$OUTPUT_DIR/prowler-output-default-$(date +'%Y%m%d%H%M%S').html"
+          REPORT_CSV="$OUTPUT_DIR/prowler-output-default-$(date +'%Y%m%d%H%M%S').csv"
+          REPORT_JSON="$OUTPUT_DIR/prowler-output-default-$(date +'%Y%m%d%H%M%S').asff.json"
+
+          # Check if reports were generated and upload them
+          if [ -f "$REPORT_HTML" ] && [ -f "$REPORT_CSV" ] && [ -f "$REPORT_JSON" ]; then
+            echo "Reports generated. Uploading to GCS..."
+
+            # Upload the reports to your Google Cloud Storage bucket
+            gsutil cp "$REPORT_HTML" gs://your-bucket-name/reports/
+            gsutil cp "$REPORT_CSV" gs://your-bucket-name/reports/
+            gsutil cp "$REPORT_JSON" gs://your-bucket-name/reports/
+
+            echo "Reports successfully uploaded to GCS."
+          else
+            echo "Error: Reports were not generated!"
+            exit 1
+          fi
+
+      - name: Clean up
         run: |
-          export DATE_TIME=$(date +'%B-%d-%Y_%H-%M-%S')
-          PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/reports/$DATE_TIME --output-modes html csv json-asff"  
+          echo "Cleaning up..."
+          # Any additional cleanup tasks (e.g., removing temporary files) can be added here.
+          
