@@ -131,21 +131,34 @@ jobs:
         with:
           name: compliance-output
           path: /home/runner/work/prowler/reports/
-          # path: /home/runner/work/prowler/reports/February-28-2025_11-56-46/compliance/
 
-      # Set the GCS_BUCKET_NAME into an environment variable for use in the next step
-      # Set the GCS_BUCKET_NAME directly as prowler-reports
+      # Upload reports to GCS
       - name: Upload reports to GCS
-        # if: ${{ github.event.inputs.enable_gcs_upload == true }}
         run: |
           GCS_BUCKET_NAME="prowler-reports"
           echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
+
           # Use the generated date-time directory in the reports path
           REPORT_DIRECTORY="/home/runner/work/prowler/reports/$DATE_TIME"
-          # Upload each file (json, csv, html) to the GCS bucket
-          gsutil cp $REPORT_DIRECTORY/*.json gs://${GCS_BUCKET_NAME}/
-          gsutil cp $REPORT_DIRECTORY/*.csv gs://${GCS_BUCKET_NAME}/
-          gsutil cp $REPORT_DIRECTORY/*.html gs://${GCS_BUCKET_NAME}/
+
+          # Check if the directory exists and upload each file type to the GCS bucket
+          if [ -d "$REPORT_DIRECTORY" ]; then
+            echo "Found report directory, uploading to GCS..."
+
+            # Upload JSON files to GCS bucket
+            gsutil cp $REPORT_DIRECTORY/*.json gs://${GCS_BUCKET_NAME}/
+
+            # Upload CSV files to GCS bucket
+            gsutil cp $REPORT_DIRECTORY/*.csv gs://${GCS_BUCKET_NAME}/
+
+            # Upload HTML files to GCS bucket
+            gsutil cp $REPORT_DIRECTORY/*.html gs://${GCS_BUCKET_NAME}/
+
+            echo "Reports successfully uploaded to GCS bucket ${GCS_BUCKET_NAME}."
+          else
+            echo "Report directory does not exist: $REPORT_DIRECTORY"
+            exit 1
+          fi
 
 
 
