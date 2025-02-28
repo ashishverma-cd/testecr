@@ -135,6 +135,7 @@ jobs:
 
       - name: Upload reports to GCS
         run: |
+          gsutil ls gs://prowler-reports/
           # Define GCS bucket name
           GCS_BUCKET_NAME="prowler-reports"
           echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
@@ -147,7 +148,7 @@ jobs:
 
           # Your GCS upload script here
           #gsutil -m cp -r "$REPORT_DIRECTORY" gs://${GCS_BUCKET_NAME}/
-          gsutil -m cp -r /home/runner/work/prowler/reports gs://prowler-reports/
+          #gsutil -m cp -r /home/runner/work/prowler/reports gs://prowler-reports/
 
 
 
