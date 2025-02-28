@@ -120,32 +120,31 @@ jobs:
           python3 -m pip install --upgrade pip
           pip3 install prowler
 
-      - name: Run Prowler for GCP and Generate Reports
+      # Run the Prowler security tool
+      - name: Run Prowler for GCP
         run: |
           # Get the current month
           export MONTH_NAME=$(date +%B)
-
+  
           # Define the output directory for the reports
           OUTPUT_DIR="/home/runner/work/prowler/prowler/output/$MONTH_NAME"
-
+  
           # Create the output directory if it doesn't exist
           mkdir -p "$OUTPUT_DIR"
-
+  
           # Run Prowler with --debug flag for detailed logs
           PROWLER_CMD="prowler gcp --output-directory $OUTPUT_DIR --output-modes html csv json-asff --debug"
           echo "Running Prowler with command: $PROWLER_CMD"
-          eval $PROWLER_CMD
+  
+          # Execute the command and capture the output in a log file
+          $PROWLER_CMD 2>&1 | tee "$OUTPUT_DIR/prowler-log.txt"
 
-          # Check if the compliance directory contains the output
-          echo "Listing files in compliance directory"
-          ls -l /home/runner/work/prowler/prowler/output/$MONTH_NAME/compliance/
-
-          # Define report filenames with timestamp
+          # Check if reports were generated
           TIMESTAMP=$(date +'%Y%m%d%H%M%S')
           REPORT_HTML="$OUTPUT_DIR/prowler-output-default-$TIMESTAMP.html"
           REPORT_CSV="$OUTPUT_DIR/prowler-output-default-$TIMESTAMP.csv"
           REPORT_JSON="$OUTPUT_DIR/prowler-output-default-$TIMESTAMP.asff.json"
-
+  
           # Check if reports were generated and log the result
           if [ -f "$REPORT_HTML" ] && [ -f "$REPORT_CSV" ] && [ -f "$REPORT_JSON" ]; then
             echo "Reports generated successfully."
