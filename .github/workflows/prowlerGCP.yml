@@ -132,17 +132,12 @@ jobs:
           name: prowler-reports
           path: /home/runner/work/prowler/reports/
       
-      - name: Install Google Cloud SDK
-        run: |
-          curl https://sdk.cloud.google.com | bash
-          source $HOME/google-cloud-sdk/path.bash.inc
-          gcloud components update
+      # - name: Install Google Cloud SDK
+      #   run: |
+      #     curl https://sdk.cloud.google.com | bash
+      #     source $HOME/google-cloud-sdk/path.bash.inc
+      #     gcloud components update
 
-      # - uses: google-github-actions/setup-gcloud@v2
-      #   with:
-      #     service_account_email: ${{ secrets.GCP_EMAIL }}
-      #     service_account_key: ${{ secrets.GCP_SA_KEY }}
-      #     project_id: ${{ secrets.GCP_PROJECT_ID }}
   
       - name: Upload reports to GCS
         run: |
