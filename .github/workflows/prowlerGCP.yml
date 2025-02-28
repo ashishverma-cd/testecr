@@ -112,24 +112,23 @@ jobs:
           gcloud auth list
           gcloud projects describe ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Upload data to artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: compliance-output
-          path: output/
-
       - name: Install pip and python3
         run: |
           sudo apt update
           sudo apt install -y python3 python3-pip
           python3 -m pip install --upgrade pip
+          pip3 install prowler
           
-      - name: Install and Run Prowler
+ 
+      - name: Running Prowler for GCP
         run: |
-          pip install prowler==4.2.4
-          prowler -v
-          prowler gcp --project-ids ${{ secrets.PROJECT_ID }}
+          export DATE_TIME=$(date +'%B-%d-%Y_%H-%M-%S')
+          PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/reports/$DATE_TIME --output-modes html csv json-asff"
+          eval $PROWLER_CMD
         continue-on-error: true
 
-
-  
+      - name: Upload data to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-output
+          path: output/
