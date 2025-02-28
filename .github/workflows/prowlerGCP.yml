@@ -125,12 +125,21 @@ jobs:
           PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/reports/$DATE_TIME --output-modes html csv json-asff"
           eval $PROWLER_CMD
         continue-on-error: true
+      - name: Debug report directory
+        run: |
+          echo "Checking if report directory exists: /home/runner/work/prowler/reports/$DATE_TIME"
+          ls -la /home/runner/work/prowler/reports/
 
       - name: Upload data to artifact
         uses: actions/upload-artifact@v4
         with:
           name: compliance-output
           path: /home/runner/work/prowler/reports/
+      
+      - name: Debug specific report directory contents
+        run: |
+          echo "Listing contents of /home/runner/work/prowler/reports"
+          ls -la /home/runner/work/prowler/reports
 
       # Upload reports to GCS
       - name: Upload reports to GCS
@@ -142,7 +151,7 @@ jobs:
           # DATE_TIME="${DATE_TIME:-$(date +'%B-%d-%Y_%H-%M-%S')}"
           
           # Use the generated date-time directory in the reports path
-          REPORT_DIRECTORY="/home/runner/work/prowler/reports/compliance-output"
+          REPORT_DIRECTORY="/"
 
           # Check if the directory exists and upload each file type to the GCS bucket
           if [ -d "$REPORT_DIRECTORY" ]; then
