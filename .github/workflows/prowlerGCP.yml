@@ -143,10 +143,12 @@ jobs:
           DATE_TIME="${DATE_TIME:-$(date +'%B-%d-%Y')}"
         
           # Use the generated date-time directory in the reports path
-          REPORT_DIRECTORY="/home/runner/work/prowler/reports"
+          #REPORT_DIRECTORY="/home/runner/work/prowler/reports"
 
           # Your GCS upload script here
-          gsutil -m cp -r "$REPORT_DIRECTORY" gs://${GCS_BUCKET_NAME}/
+          #gsutil -m cp -r "$REPORT_DIRECTORY" gs://${GCS_BUCKET_NAME}/
+          gsutil -m cp -r /home/runner/work/prowler/reports gs://prowler-reports/
+
 
 
 
