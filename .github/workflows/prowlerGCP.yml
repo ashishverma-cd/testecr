@@ -137,28 +137,25 @@ jobs:
           # Execute the Prowler command
           eval $PROWLER_CMD
 
-          # Define report filenames
-          REPORT_HTML="$OUTPUT_DIR/prowler-output-default-$(date +'%Y%m%d%H%M%S').html"
-          REPORT_CSV="$OUTPUT_DIR/prowler-output-default-$(date +'%Y%m%d%H%M%S').csv"
-          REPORT_JSON="$OUTPUT_DIR/prowler-output-default-$(date +'%Y%m%d%H%M%S').asff.json"
+          # Define report filenames with timestamp
+          TIMESTAMP=$(date +'%Y%m%d%H%M%S')
+          REPORT_HTML="$OUTPUT_DIR/prowler-output-default-$TIMESTAMP.html"
+          REPORT_CSV="$OUTPUT_DIR/prowler-output-default-$TIMESTAMP.csv"
+          REPORT_JSON="$OUTPUT_DIR/prowler-output-default-$TIMESTAMP.asff.json"
 
-          # Check if reports were generated and upload them
+          # Check if reports were generated and log the result
           if [ -f "$REPORT_HTML" ] && [ -f "$REPORT_CSV" ] && [ -f "$REPORT_JSON" ]; then
-            echo "Reports generated. Uploading to GCS..."
-
-            # Upload the reports to your Google Cloud Storage bucket
-            gsutil cp "$REPORT_HTML" gs://your-bucket-name/reports/
-            gsutil cp "$REPORT_CSV" gs://your-bucket-name/reports/
-            gsutil cp "$REPORT_JSON" gs://your-bucket-name/reports/
-
-            echo "Reports successfully uploaded to GCS."
+            echo "Reports generated successfully."
+            echo "HTML Report: $REPORT_HTML"
+            echo "CSV Report: $REPORT_CSV"
+            echo "JSON Report: $REPORT_JSON"
           else
             echo "Error: Reports were not generated!"
             exit 1
           fi
 
-      - name: Clean up
+      - name: Clean up (Optional)
         run: |
           echo "Cleaning up..."
-          # Any additional cleanup tasks (e.g., removing temporary files) can be added here.
+          # Any additional cleanup tasks can be added here.
           
