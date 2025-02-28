@@ -144,29 +144,33 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
   
-      - name: Define GCS bucket name
-        run: |
-          GCS_BUCKET_NAME="${{ secrets.GCS_BUCKET_NAME }}"
-          echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
-  
-      - name: Set the DATE_TIME variable
-        run: |
-          DATE_TIME="${DATE_TIME:-$(date +'%B-%d-%Y')}"
-          
-      - name: Set the report directory path
-        run: |
-          REPORT_DIRECTORY="/home/runner/work/prowler/reports"
-          echo "Using directory: $REPORT_DIRECTORY"
-  
       - name: Upload reports to GCS
         run: |
+          # Define GCS bucket name
+          GCS_BUCKET_NAME="prowler-reports"
           echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
-          gsutil -m cp -r "$REPORT_DIRECTORY" gs://${GCS_BUCKET_NAME}/
+        
+          # Ensure the DATE_TIME variable is defined
+          DATE_TIME="${DATE_TIME:-$(date +'%B-%d-%Y')}"
+        
+          # Use the generated date-time directory in the reports path
+          REPORT_DIRECTORY="/home/runner/work/prowler/reports"
           
-      - name: Confirm upload
-        run: |
-          echo "Verifying uploaded files..."
-          gsutil ls gs://${GCS_BUCKET_NAME}/
+          # Check if the compliance-output directory exists and upload it to the GCS bucket
+          if [ -d "$REPORT_DIRECTORY" ]; then
+            echo "Found compliance-output directory, uploading to GCS..."
+          
+            # Upload the entire compliance-output folder to GCS bucket
+            gsutil -m cp -r "$REPORT_DIRECTORY" gs://${GCS_BUCKET_NAME}/
+        
+            echo "compliance-output folder successfully uploaded to GCS bucket ${GCS_BUCKET_NAME}."
+          else
+            echo "compliance-output directory does not exist: $REPORT_DIRECTORY"
+            exit 1
+          fi
+
+          # Your GCS upload script here
+          gsutil -m cp -r "$REPORT_DIRECTORY" gs://${GCS_BUCKET_NAME}/
   
   
   
