@@ -132,24 +132,48 @@ jobs:
           name: prowler-reports
           path: /home/runner/work/prowler/reports/
       
-
-      - name: Upload reports to GCS
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          version: '355.0.0'
+  
+      - name: Authenticate with Google Cloud using Workload Identity Federation
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: "projects/295233741425/locations/global/workloadIdentityPools/prowler/providers/reposrts"
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          access_token_lifetime: 300s
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+  
+      - name: Check GCS Bucket Access
         run: |
           gsutil ls gs://prowler-reports/
-          # Define GCS bucket name
-          GCS_BUCKET_NAME="prowler-reports"
-          echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
-        
-          # Ensure the DATE_TIME variable is defined#
+  
+      - name: Define GCS bucket name
+        run: |
+            GCS_BUCKET_NAME="prowler-reports"
+            echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
+  
+      - name: Set the DATE_TIME variable
+        run: |
           DATE_TIME="${DATE_TIME:-$(date +'%B-%d-%Y')}"
-        
-          # Use the generated date-time directory in the reports path
-          #REPORT_DIRECTORY="/home/runner/work/prowler/reports"
-
-          # Your GCS upload script here
-          #gsutil -m cp -r "$REPORT_DIRECTORY" gs://${GCS_BUCKET_NAME}/
-          #gsutil -m cp -r /home/runner/work/prowler/reports gs://prowler-reports/
-
-
-
+          
+      - name: Set the report directory path
+        run: |
+          REPORT_DIRECTORY="/home/runner/work/prowler/reports"
+          echo "Using directory: $REPORT_DIRECTORY"
+  
+      - name: Upload reports to GCS
+        run: |
+          echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
+          gsutil -m cp -r "$REPORT_DIRECTORY" gs://${GCS_BUCKET_NAME}/
+  
+      - name: Confirm upload
+        run: |
+          echo "Verifying uploaded files..."
+          gsutil ls gs://${GCS_BUCKET_NAME}/
+  
+  
+  
 
