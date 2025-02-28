@@ -131,11 +131,14 @@ jobs:
           # Create the output directory if it doesn't exist
           mkdir -p "$OUTPUT_DIR"
 
-          # Run Prowler with specified output modes
-          PROWLER_CMD="prowler gcp --output-directory $OUTPUT_DIR --output-modes html csv json-asff"
-
-          # Execute the Prowler command
+          # Run Prowler with --debug flag for detailed logs
+          PROWLER_CMD="prowler gcp --output-directory $OUTPUT_DIR --output-modes html csv json-asff --debug"
+          echo "Running Prowler with command: $PROWLER_CMD"
           eval $PROWLER_CMD
+
+          # Check if the compliance directory contains the output
+          echo "Listing files in compliance directory"
+          ls -l /home/runner/work/prowler/prowler/output/$MONTH_NAME/compliance/
 
           # Define report filenames with timestamp
           TIMESTAMP=$(date +'%Y%m%d%H%M%S')
@@ -153,9 +156,3 @@ jobs:
             echo "Error: Reports were not generated!"
             exit 1
           fi
-
-      - name: Clean up (Optional)
-        run: |
-          echo "Cleaning up..."
-          # Any additional cleanup tasks can be added here.
-          
