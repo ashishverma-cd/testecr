@@ -126,10 +126,17 @@ jobs:
           eval $PROWLER_CMD
         continue-on-error: true
 
+      - name: Upload data to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-output
+          path: /home/runner/work/prowler/reports/
+          # path: /home/runner/work/prowler/reports/February-28-2025_11-56-46/compliance/
+
       # Set the GCS_BUCKET_NAME into an environment variable for use in the next step
       # Set the GCS_BUCKET_NAME directly as prowler-reports
       - name: Upload reports to GCS
-        if: ${{ github.event.inputs.enable_gcs_upload == true }}
+        # if: ${{ github.event.inputs.enable_gcs_upload == true }}
         run: |
           GCS_BUCKET_NAME="prowler-reports"
           echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
@@ -140,10 +147,6 @@ jobs:
           gsutil cp $REPORT_DIRECTORY/*.csv gs://${GCS_BUCKET_NAME}/
           gsutil cp $REPORT_DIRECTORY/*.html gs://${GCS_BUCKET_NAME}/
 
-      - name: Upload data to artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: compliance-output
-          path: /home/runner/work/prowler/reports/$DATE_TIME/
+
 
 
