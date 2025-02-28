@@ -126,9 +126,12 @@ jobs:
           eval $PROWLER_CMD
         continue-on-error: true
 
-      # Upload reports to GCS only if the GCS_BUCKET_NAME secret and enable_gcs_upload flag are set
+      - name: Set GCS_BUCKET_NAME for later use
+        id: gcs_check
+        run: echo "GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }}" >> $GITHUB_ENV
+
       - name: Upload reports to GCS
-        if: ${{ github.event.inputs.enable_gcs_upload == true && secrets.GCS_BUCKET_NAME }}
+        if: ${{ env.GCS_BUCKET_NAME != '' && github.event.inputs.enable_gcs_upload == true }}
         run: |
           echo "Uploading reports to GCS bucket ${GCS_BUCKET_NAME}"
 
@@ -136,9 +139,9 @@ jobs:
           REPORT_DIRECTORY="/home/runner/work/prowler/reports/$DATE_TIME"
 
           # Upload each file (json, csv, html) to the GCS bucket
-          gsutil cp $REPORT_DIRECTORY/*.json gs://${{ secrets.GCS_BUCKET_NAME }}/
-          gsutil cp $REPORT_DIRECTORY/*.csv gs://${{ secrets.GCS_BUCKET_NAME }}/
-          gsutil cp $REPORT_DIRECTORY/*.html gs://${{ secrets.GCS_BUCKET_NAME }}/
+          gsutil cp $REPORT_DIRECTORY/*.json gs://${GCS_BUCKET_NAME}/
+          gsutil cp $REPORT_DIRECTORY/*.csv gs://${GCS_BUCKET_NAME}/
+          gsutil cp $REPORT_DIRECTORY/*.html gs://${GCS_BUCKET_NAME}/
 
       - name: Upload data to artifact
         uses: actions/upload-artifact@v4
