@@ -144,18 +144,9 @@ jobs:
         
           # Use the generated date-time directory in the reports path
           REPORT_DIRECTORY="/home/runner/work/prowler/reports"
-          
-          # Check if the compliance-output directory exists and upload it to the GCS bucket
-          if [ -d "$REPORT_DIRECTORY" ]; then
-            echo "Found compliance-output directory, uploading to GCS..."
-          
-            # Upload the entire compliance-output folder to GCS bucket
-            gsutil -m cp -r "$REPORT_DIRECTORY" gs://${GCS_BUCKET_NAME}/
-        
-            echo "compliance-output folder successfully uploaded to GCS bucket ${GCS_BUCKET_NAME}."
-          else
-            echo "compliance-output directory does not exist: $REPORT_DIRECTORY"
-            exit 1
-          fi
+
+          # Your GCS upload script here
+          gsutil -m cp -r "$REPORT_DIRECTORY" gs://${GCS_BUCKET_NAME}/
+
 
 
