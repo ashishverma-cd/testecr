@@ -119,20 +119,9 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip3 install prowler
-
       - name: Running Prowler for GCP
         run: |
-          export MONTH_NAME=$(date +%B)
-          PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/prowler/output/$MONTH_NAME --output-modes html csv json-asff"
-          continue-on-error: true
-      - name: Check if Prowler report files exist
+      - name: Running Prowler for GCP
         run: |
-          if [ -f "/home/runner/work/prowler/prowler/output/$MONTH_NAME/prowler-output-default-$(date +'%Y%m%d%H%M%S').html" ] && \
-             [ -f "/home/runner/work/prowler/prowler/output/$MONTH_NAME/prowler-output-default-$(date +'%Y%m%d%H%M%S').csv" ] && \
-             [ -f "/home/runner/work/prowler/prowler/output/$MONTH_NAME/prowler-output-default-$(date +'%Y%m%d%H%M%S').asff.json" ]; then
-            echo "Reports found, proceeding with the next step."
-          else
-            echo "Reports not found, skipping the next step."
-            exit 1  # Stop the workflow if the reports do not exist
-          fi
-  # Example of next step to run if reports are found
+          export DATE_TIME=$(date +'%B-%d-%Y_%H-%M-%S')
+          PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/reports/$DATE_TIME --output-modes html csv json-asff"  
