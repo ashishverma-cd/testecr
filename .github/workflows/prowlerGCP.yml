@@ -129,3 +129,14 @@ jobs:
           PROWLER_CMD="prowler gcp --output-directory /home/runner/work/prowler/prowler/output/$MONTH_NAME --output-modes html csv json-asff"
           eval $PROWLER_CMD
           continue-on-error: true
+      - name: Check if Prowler report files exist
+        run: |
+          if [ -f "/home/runner/work/prowler/prowler/output/$MONTH_NAME/prowler-output-default-$(date +'%Y%m%d%H%M%S').html" ] && \
+             [ -f "/home/runner/work/prowler/prowler/output/$MONTH_NAME/prowler-output-default-$(date +'%Y%m%d%H%M%S').csv" ] && \
+             [ -f "/home/runner/work/prowler/prowler/output/$MONTH_NAME/prowler-output-default-$(date +'%Y%m%d%H%M%S').asff.json" ]; then
+            echo "Reports found, proceeding with the next step."
+          else
+            echo "Reports not found, skipping the next step."
+            exit 1  # Stop the workflow if the reports do not exist
+          fi
+  # Example of next step to run if reports are found
