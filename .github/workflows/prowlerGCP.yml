@@ -143,7 +143,7 @@ jobs:
           DATE_TIME="${DATE_TIME:-$(date +'%B-%d-%Y')}"
         
           # Use the generated date-time directory in the reports path
-          REPORT_DIRECTORY="/home/runner/work/prowler/reports/prowler-reports"
+          REPORT_DIRECTORY="/home/runner/work/prowler/reports"
           
           # Check if the compliance-output directory exists and upload it to the GCS bucket
           if [ -d "$REPORT_DIRECTORY" ]; then
