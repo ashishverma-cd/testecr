@@ -1,8 +1,8 @@
 name: testecr
-id: 5a4dfa76-cfce-453c-b013-230880f93ede
+id: 60bad3a0-0c02-4bf2-9d41-f9945f353e23
 kind: helm
 publisher:
   name: Akon Verma
-  email: akonverma97@example.com
+  email: ashish.verma@clouddrove.com
   url: https://github.com/akonverma97
 
