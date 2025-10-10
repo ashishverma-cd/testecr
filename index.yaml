@@ -3,13 +3,13 @@ entries:
   sample-node-app:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2025-10-10T03:46:58.498425+05:30"
+    created: "2025-10-11T02:22:39.983159+05:30"
     description: A Helm chart for a simple Node.js Hello World application
-    digest: 029e276baad0048761a2d1f944f2952a3d32bfc57594f442f3187d6a8adb1b03
+    digest: 2eb77e1f302b812da3d181b43fcd80bea85e628a4d76e3b1c9f8712b3d96e956
     icon: https://raw.githubusercontent.com/akonverma97/testecr/main/github-logo.png
     name: sample-node-app
     type: application
     urls:
     - https://akonverma97.github.io/testecr/sample-node-app-1.0.0.tgz
     version: 1.0.0
-generated: "2025-10-10T03:46:58.4977+05:30"
+generated: "2025-10-11T02:22:39.982389+05:30"
